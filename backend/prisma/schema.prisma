@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+  transactions Transaction[]
+  goals        Goal[]
+  savings      Savings[]
+  settings     Settings?
+  debts        Debt[]
+}
+
+model Transaction {
+  id          Int      @id @default(autoincrement())
+  description String
+  amount      Float
+  type        String
+  category    String
+  createdAt   DateTime @default(now())
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Goal {
+  id        Int      @id @default(autoincrement())
+  name      String
+  target    Float
+  current   Float    @default(0)
+  createdAt DateTime @default(now())
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Savings {
+  id        Int      @id @default(autoincrement())
+  amount    Float
+  createdAt DateTime @default(now())
+  userId    Int?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Settings {
+  id             Int    @id @default(autoincrement())
+  savingsPercent Float  @default(10)
+  userId         Int?   @unique
+  user           User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Debt {
+  id           Int      @id @default(autoincrement())
+  name         String
+  totalAmount  Float
+  installments Int
+  paid         Int      @default(0)
+  createdAt    DateTime @default(now())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
